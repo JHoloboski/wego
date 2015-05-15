@@ -103,6 +103,7 @@ var (
 		false: "km/h",
 		true:  "mph",
 	}
+	slottimes = [slotcount]int {9 * 60, 12 * 60, 18 * 60, 22 * 60}
 	codes = map[int][]string{
 		113: iconSunny,
 		116: iconPartlyCloudy,
@@ -272,6 +273,7 @@ var (
 
 const (
 	uri = "https://api.worldweatheronline.com/free/v2/weather.ashx?"
+	slotcount = 4
 )
 
 func configload() error {
@@ -430,6 +432,20 @@ func printDay(w weather) (ret []string) {
 	for i := range ret {
 		ret[i] = "│"
 	}
+
+	var slots [slotcount]cond
+	for _, h := range hourly {
+		var d time.Time
+		if d, err := time.Parse("1504", h.Time); err != nil {
+			continue
+		}
+		c := d.Hour() * 60 + d.Minute()
+		for i, s := range slots {
+			if math.Abs(c - slottimes[i]) < s.Time
+		}
+	}
+
+
 	for _, h := range hourly {
 		if h.Time == "0" || h.Time == "100" ||
 			h.Time == "200" || h.Time == "300" || h.Time == "400" ||
@@ -498,7 +514,7 @@ func main() {
 	params = append(params, "tp=3")
 	params = append(params, "lang=de")
 
-	// fmt.Fprintln(os.Stderr, params)
+	 fmt.Fprintln(os.Stderr, params)
 
 	res, err := http.Get(uri + strings.Join(params, "&"))
 	if err != nil {
@@ -510,7 +526,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// fmt.Println(string(body))
+	 fmt.Println(string(body))
 
 	var r resp
 	if err = json.Unmarshal(body, &r); err != nil {
